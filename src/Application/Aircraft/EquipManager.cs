@@ -182,7 +182,7 @@ namespace UnityGERunner.UnityApplication
 	
 	        if (missile.guidanceMode == MissileGuidanceMode.Radar)
 	        {
-	            var selectedTarget = (radar.pdtTwsIdx != -1 && radar.pdtTwsIdx > 0 && radar.pdtTwsIdx <= radar.twsedTargets.Count) ? radar.twsedTargets[radar.pdtTwsIdx] : radar.lockData?.actor;
+	            var selectedTarget = (radar.pdtTwsIdx != -1 && radar.pdtTwsIdx >= 0 && radar.pdtTwsIdx <= radar.twsedTargets.Count) ? radar.twsedTargets[radar.pdtTwsIdx] : radar.lockData?.actor;
 	            if (selectedTarget == null)
 	            {
 	                Logger.Warn("[HSGE] " + $"No selected target for ARH fire, pdt idx: {radar.pdtTwsIdx}");
