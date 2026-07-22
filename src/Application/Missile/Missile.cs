@@ -58,6 +58,7 @@ namespace UnityGERunner.UnityApplication
 	    public float maxBallisticOffset = 100f;
 	    public float minBallisticCalcSpeed;
 	    private Vector3 steerAccum;
+	    private bool guidanceEngaged = false;
 	
 	    
 	    public float warheadRadius;
@@ -342,7 +343,10 @@ namespace UnityGERunner.UnityApplication
 	        float num = 0f;
 	        float num2 = Vector3.Distance(estTargetPos, transform.position);
 	        Vector3 vector = Mathf.Max(rb.linearVelocity.magnitude, minGuidanceSimSpeed) * rb.linearVelocity.normalized;
-	        num = num2 / (estTargetVel - vector).magnitude;
+	        Vector3 relativeVelocity = estTargetVel - vector;
+	        Vector3 losDirection = (estTargetPos - transform.position).normalized;
+	        float closingSpeed = Mathf.Max(-Vector3.Dot(relativeVelocity, losDirection), 1f);
+	        num = num2 / closingSpeed;
 	        num = Mathf.Clamp(leadTimeMultiplier * num, 0f, maxLeadTime);
 	        Vector3 vector2 = estTargetPos + estTargetVel * num;
 	        if (num2 < 1000f)
@@ -354,7 +358,7 @@ namespace UnityGERunner.UnityApplication
 	        {
 	            float num3 = Mathf.Lerp(3f, 1f, maxBallisticOffset / 90f);
 	            var ree = (estTargetPos.y > transform.position.y) ? 45 : 25;
-	            result = BallisticPoint(vector2, rb.linearVelocity.magnitude * num3, (estTargetPos.y > transform.position.y) ? 45 : 25);
+	            result = BallisticPoint(vector2, Mathf.Max(rb.linearVelocity.magnitude, minGuidanceSimSpeed) * num3, (estTargetPos.y > transform.position.y) ? 45 : 25);
 	        }
 	
 	        return result;
@@ -383,6 +387,17 @@ namespace UnityGERunner.UnityApplication
 	    private void SteerToTarget()
 	    {
 	        if (Time.time - timeFired < thrustDelay) return;
+	        if (rb.linearVelocity.magnitude < minGuidanceSimSpeed)
+	        {
+	            guidanceEngaged = false;
+	            return;
+	        }
+	
+	        if (!guidanceEngaged)
+	        {
+	            guidanceEngaged = true;
+	            steerAccum = Vector3.zero;
+	        }
 	
 	        Vector3 aimPoint = BallisticLeadTargetPoint();
 	
