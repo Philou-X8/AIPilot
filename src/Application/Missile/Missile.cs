@@ -168,6 +168,7 @@ namespace UnityGERunner.UnityApplication
 	            simpleDrag.rb = rb;
 	        }
 	        if (heatSeeker != null) heatSeeker.triggerUncaged = true;
+	        if (aamSearchRadar != null) aamSearchRadar.radarActorId = entityId;
 	
 	        var wings = GetComponentsInChildren<OmniWing>();
 	        foreach (var wing in wings)
